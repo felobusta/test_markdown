@@ -1,7 +1,7 @@
 ---
 title: "basic text analysis"
 output: 
-  html_document:
+  github_document:
     theme: cerulean
 ---
 
