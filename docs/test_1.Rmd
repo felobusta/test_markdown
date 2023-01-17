@@ -1,21 +1,34 @@
 ---
-title: "test_1"
+title: ""
 output: 
   html_document:
+    fig_caption: yes
     theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+    
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Text analysis with R
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Create links
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
+We being this tutorial with downloading the data we will use for text analysis. 
+First, we must go to the media outlet from where we want to get the data and see if their search bar give us results per page or on a slide manner, or if they have tags to identify certain topics. If its per page you also have to check that the media outlet let's you go to the next page and that it doesn't involve the use of some javascript in the page that doesn't change the URL. 
+
+An example is https://www.latercera.com/etiqueta/coronavirus/, this website gives you the option of clicking "next page" or "page 2", etc, and each time you go the next one you get a new URL. On the other hand, https://www.emol.com/tag/coronavirus/1566/todas.aspx makes a query without changing the page. For the first case we use R and for the second case we use python to download the links (check the other repo to get that code)
+
+After checking we can see that  https://www.latercera.com/etiqueta/coronavirus/ has 667 pages, so 667 links where we have to get the other links. As such, we first have to create each link of the 667 https://www.latercera.com/etiqueta/coronavirus/page/, we will try with only 3 pages in this example. 
+
+
+```{r cars,results = 'hide', message=FALSE}
+
 library(rvest)
 library(tidyverse)
 library(topicmodels)
@@ -25,7 +38,12 @@ library(ldatuning)
 library(rlist)
 library(stm)
 
-page<- (1:5)
+```
+
+
+```{r cars2}
+
+page<- (1:3)
 
 urls <- list()
 
@@ -34,13 +52,14 @@ for (i in 1:length(page)) {
   url<- paste0("https://www.latercera.com/etiqueta/coronavirus/page/",page[i])
   urls[[i]] <- url
 }
+
 urls
 
 ```
 
-## Including Plots - WTF
+## Download links
 
-You can also embed plots, for example:
+Now that we have created the main website links we can start downloading individual articles. For this we use rvest to get the html code we are instered in. In this example, you can go to your web-browser and enter this website "https://www.latercera.com/etiqueta/coronavirus/page/1" or the version of a media outlet of your preference, right click anywhere and click inspect. Now you should be able to see the developer tools. Click on the headline of the article and on the devtools you will see some html code highlighted, right click on it, go to copy and click copy full xpath. You probably got something like this: "/html/body/div/div[1]/div/main/section[2]/div[1]/article[2]/div/div[2]/h3/a". In a sense, these are the directions for rvest to get the content we want. You can see that there are some numbers between these brackets "[]", you must delete the number and the bracket, that way rvest will copy every html code related to those parts of the site and not only the one you clicked. 
 
 ```{r pressure}
 
@@ -61,4 +80,47 @@ for (j in seq_along(urls)) {
 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+We got a list full of links, we can see that alfa is alfa[[n]][y], where "n" represents the main page and "y" each article.
+
+```{r pressure 2}
+
+alfa[[1]][1:3]
+
+
+```
+
+
+## Missing links or #404 error
+
+We have created our links list named alfa, but some error may have happened and we skipped those links thanks to "try()". As such, we have to check for empty lists, or list of length 0:
+
+```{r pressure 3}
+
+length(alfa[lengths(alfa) == 0])
+
+```
+
+If there is a list of length 0 we will replace it with "/PERDIDO". Later we will add the links of each article to a main data frame, so this will be useful to identify the missing cases. 
+```{r pressure 4}
+
+alfa[lengths(alfa) == 0] <- "/PERDIDO"
+
+```
+
+## Incomplete links
+
+The way /html/body/div/div/div/main/section/div/article/div/div/h3/a works in our media outlet only gives us part of the URL, specifically, it doesn't include the "https://www.latercera.com" portion, so we have to create the rest:
+
+```{r pressure 5}
+
+todas <- as.list(paste0("https://www.latercera.com",unlist(alfa)))
+length(todas) #check how many links you get
+toda.news <- unlist(todas) 
+#"todas" is a list that contains list so create an list with all the links
+#because we only get a couple of thousands links you could save them in an excel file
+#library(xlsx)
+#write.xlsx(toda.news, 'linksLaTercera.xlsx')
+
+```
+
+
