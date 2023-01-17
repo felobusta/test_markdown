@@ -44,7 +44,20 @@ You can also embed plots, for example:
 
 ```{r pressure}
 
-length(urls)
+alfa<- list()
+
+for (j in seq_along(urls)) {
+  try({ #we use try because sometimes our connection may not be the best, so we want the code to skips some links when thats the case
+  alfa[[j]]<- urls[[j]]%>%
+    session()%>%
+    #you can check the xpath by inspecting the webpage in chrome
+    html_nodes(xpath = "/html/body/div/div/div/main/section/div/article/div/div/h3/a")%>%
+    html_attr('href')
+    #we add a print to get the number of each page in case there is some error (404 error) or problem with our connection
+  print(j)
+  })
+}
+
 
 ```
 
