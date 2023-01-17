@@ -1,5 +1,8 @@
 ---
 title: ""
+author: 
+  - name: Felipe Bustamante
+    mail: fnbustam@uc.cl
 output: 
   html_document:
     fig_caption: yes
@@ -7,6 +10,7 @@ output:
     toc: yes
     toc_depth: 3
     toc_float: yes
+    df_print: paged
     
 ---
 
@@ -22,7 +26,7 @@ knitr::opts_chunk$set(echo = TRUE)
 We being this tutorial with downloading the data we will use for text analysis. 
 First, we must go to the media outlet from where we want to get the data and see if their search bar give us results per page or on a slide manner, or if they have tags to identify certain topics. If its per page you also have to check that the media outlet let's you go to the next page and that it doesn't involve the use of some javascript in the page that doesn't change the URL. 
 
-An example is https://www.latercera.com/etiqueta/coronavirus/, this website gives you the option of clicking "next page" or "page 2", etc, and each time you go the next one you get a new URL. On the other hand, https://www.emol.com/tag/coronavirus/1566/todas.aspx makes a query without changing the page. For the first case we use R and for the second case we use python to download the links (check the other repo to get that code)
+An example is https://www.latercera.com/etiqueta/coronavirus/, this website gives you the option of clicking "next page" or "page 2", etc, and each time you go the next one you get a new URL. On the other hand, https://www.emol.com/tag/coronavirus/1566/todas.aspx makes a query without changing the page. For the first case we use R and for the second case we use python to download the links (check **[here](#https://github.com/felobusta/newsrecollection/blob/main/emolscraping_1.py)** to get that code)
 
 After checking we can see that  https://www.latercera.com/etiqueta/coronavirus/ has 667 pages, so 667 links where we have to get the other links. As such, we first have to create each link of the 667 https://www.latercera.com/etiqueta/coronavirus/page/, we will try with only 3 pages in this example. 
 
@@ -59,7 +63,7 @@ urls
 
 ## Download links
 
-Now that we have created the main website links we can start downloading individual articles. For this we use rvest to get the html code we are instered in. In this example, you can go to your web-browser and enter this website "https://www.latercera.com/etiqueta/coronavirus/page/1" or the version of a media outlet of your preference, right click anywhere and click inspect. Now you should be able to see the developer tools. Click on the headline of the article and on the devtools you will see some html code highlighted, right click on it, go to copy and click copy full xpath. You probably got something like this: "/html/body/div/div[1]/div/main/section[2]/div[1]/article[2]/div/div[2]/h3/a". In a sense, these are the directions for rvest to get the content we want. You can see that there are some numbers between these brackets "[]", you must delete the number and the bracket, that way rvest will copy every html code related to those parts of the site and not only the one you clicked. 
+Now that we have created the main website links we can start downloading individual articles. For this we use rvest to get the html code we are instered in. In this example, you can go to your web-browser and enter this website "https://www.latercera.com/etiqueta/coronavirus/page/1" or the version of a media outlet of your preference, right click anywhere and click inspect. Now you should be able to see the developer tools. Click on the headline of the article and on the devtools you will see some html code highlighted, right click on it, go to copy and click copy full xpath. You probably got something like this: <span style="color:red">"/html/body/div/div[1]/div/main/section[2]/div[1]/article[2]/div/div[2]/h3/a"</span>. In a sense, these are the directions for rvest to get the content we want. You can see that there are some numbers between these brackets <span style="color:red">"[]"</span>, you must delete the number and the bracket, that way rvest will copy every html code related to those parts of the site and not only the one you clicked. 
 
 ```{r pressure}
 
@@ -109,7 +113,7 @@ alfa[lengths(alfa) == 0] <- "/PERDIDO"
 
 ## Incomplete links
 
-The way /html/body/div/div/div/main/section/div/article/div/div/h3/a works in our media outlet only gives us part of the URL, specifically, it doesn't include the "https://www.latercera.com" portion, so we have to create the rest:
+The way <span style="color:red">/html/body/div/div/div/main/section/div/article/div/div/h3/a</span> works in our media outlet only gives us part of the URL, specifically, it doesn't include the "https://www.latercera.com" portion, so we have to create the rest:
 
 ```{r pressure 5}
 
@@ -124,3 +128,100 @@ toda.news <- unlist(todas)
 ```
 
 
+## Downloading the content
+
+
+In toda.news we have 45 links from 45 articles. We will use only three links for this example. First we create an object with those 3 links
+
+```{r pressure 6}
+
+toda.news[1:3]->example.links
+example.links
+
+```
+
+After this we can start working in our code to download the different parts of the article. It is important that you check multiple articles using the inspect option before running your code, as not every article has the same structure or xpath for each part. 
+
+In our example the parts of the article look like this, after removing the brackets and numbers from our xpath:
+
+* Headline: /html/body/div/div/section/article/header/div/div/h1/div
+* Date: /html/body/div/div/section/article/header/div/div/div/time
+* Body: /html/body/div/div/section/article/div/div/div/div/div/p
+
+You must add "|" after each part to get the data.
+
+
+```{r pressure 7}
+
+pruebaTercera_try <- list()
+
+for (j in seq_along(example.links)) {try({
+  pruebaTercera_try[[j]] <- example.links[[j]] %>% 
+    session() %>% 
+    html_nodes(xpath = "/html/body/div/div/section/article/header/div/div/h1/div| 
+                     /html/body/div/div/section/article/header/div/div/div/time|
+             /html/body/div/div/section/article/div/div/div/div/div/p") %>%
+    html_text()
+  print(j)
+})
+}
+
+#you can also print the list created pruebaTercera_try
+
+```
+
+Previously I told you that some links may not work, so to replace those empty list we must add the "PERDIDO" option. 
+
+```{r pressure 8}
+
+pruebaTercera_try[lengths(pruebaTercera_try) == 0] <- "PERDIDO"
+```
+
+## Creating the dataframe
+
+Now we have a really big list of lists and want to transform it to a dataframe to work on it on a more tidy way. Because in our previous code to download each part of the article we put each part in an order, we know that the first object of the list is the headline, the second one is the date and the third one the body of the article. So, we run some code to create multiple lists containing each part. 
+
+```{r pressure 9}
+
+fecha      <- list()
+titular    <- list()
+nueva      <- list()
+split.news <- list()
+
+for (i in seq_along(pruebaTercera_try)) {
+  i <- i
+  titular[[i]]    <- pruebaTercera_try[[i]][1]
+  fecha[[i]]      <- pruebaTercera_try[[i]][2]
+  nueva[[i]]      <- paste(pruebaTercera_try[[i]], collapse = '/')
+  split.news[[i]] <- str_split(nueva, "/", n = 3)[[i]][3]
+}
+
+```
+
+After this we merge all our lists into a new dataframe and copy each link. Alternatively you can also add a ID variable with the name of the media outlet.
+
+```{r pressure 10}
+
+news.scraping<-cbind(data.frame(unlist(titular)), 
+                          data.frame(unlist(fecha)), 
+                          data.frame(unlist(split.news)))%>%
+  mutate(headline = as.character(unlist(titular)),
+         date   = as.character(unlist(fecha)),
+         body = as.character(unlist(split.news)))%>%
+  select(headline, 
+         date, 
+         body)
+
+news.scraping$link <- unlist(example.links)
+news.scraping$newspaper <- "La Tercera"
+
+
+```
+
+Finally, we check for the first row of our data.
+
+```{r pressure 11}
+
+news.scraping
+
+```
