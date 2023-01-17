@@ -431,7 +431,7 @@ for (j in seq_along(urls)) {
     session()%&gt;%
     #you can check the xpath by inspecting the webpage in chrome
 
-    html_nodes(xpath = &quot;/html/body/div/div/div/main/section/div/article/div/div/h3/a&quot;)%&gt;%
+html_nodes(xpath = &quot;/html/body/div/div/div/main/section/div/article/div/div/h3/a&quot;)%&gt;%
     html_attr(&#39;href&#39;)
     #we add a print to get the nomber of each page in case there is some error (404 error) or problem with our connection
   print(j)
@@ -445,22 +445,6 @@ for (j in seq_along(urls)) {
 <p>Note that the <code>echo = FALSE</code> parameter was added to the
 code chunk to prevent printing of the R code that generated the
 plot.</p>
-<pre class="r"><code>alfa[[1]]</code></pre>
-<pre><code>##  [1] &quot;/nacional/noticia/vacunate-hoy-con-bivalente-revisa-cuales-son-los-nuevos-grupos-que-se-pueden-inocular-con-la-vacuna-anual-contra-el-covid-19/TE7FYPKT5RECBHU5TUP4TVZNNU/&quot;
-##  [2] &quot;/nacional/noticia/minsal-reporta-1774-nuevos-contagios-y-hospitalizados-en-uci-por-covid-registran-su-cifra-mas-alta-en-40-dias/KP7TYX2KOJCRJDHHGDUE6YZOGY/&quot;               
-##  [3] &quot;/nacional/noticia/minsal-reporta-2476-casos-nuevos-de-covid-y-casos-a-nivel-nacional-disminuyen-en-154-en-la-ultima-semana/PL56RSTGIVE7RBVCQY2YOMIBIQ/&quot;                    
-##  [4] &quot;/nacional/noticia/minsal-aumenta-esfuerzos-para-llegar-al-80-de-la-poblacion-objetivo-inoculada-con-bivalente-en-mayo/TVVJVKKORRH4LDIRYIEITZR7PA/&quot;                         
-##  [5] &quot;/nacional/noticia/minsal-reporta-2931-casos-nuevos-de-covid/4IZ6KNQQP5DQ7A67NCJJOJ74GE/&quot;                                                                                   
-##  [6] &quot;/nacional/noticia/minsal-reporta-mas-de-3000-contagios-nuevos-de-covid-y-positividad-es-del-1395/MNL6YKUIBBCEFAPYGBN3ZLPKDY/&quot;                                              
-##  [7] &quot;/nacional/noticia/minsal-amplia-grupos-de-vacunacion-con-bivalente-y-anuncia-nueva-campana-y-recursos-para-incentivar-inoculacion/IH2DTHIDCVFB7OCOUZSLZCOCZQ/&quot;             
-##  [8] &quot;/nacional/noticia/minsal-reporta-3541-nuevos-contagios-covid-y-51-fallecidos-registrados/ZW4T4QDA5ZHU5BFQ7WAK6UPPOU/&quot;                                                      
-##  [9] &quot;/nacional/noticia/minsal-reporta-3697-casos-nuevos-de-covid-y-5-fallecidos-registrados/IWTNIH77AJAIJGE6ZGCVL7WU3U/&quot;                                                        
-## [10] &quot;/mundo/noticia/china-suspende-visas-a-surcoreanos-en-disputa-por-covid-19/BWJGJ72W5ZD2LHZUZU5Q235DSY/&quot;                                                                     
-## [11] &quot;/que-pasa/noticia/kraken-oms-advierte-que-subvariante-esta-en-25-paises-y-es-resistente-a-algunos-tratamientos/HLXHCEIPFZD6JDGCVQEJFKQOO4/&quot;                                
-## [12] &quot;/que-pasa/noticia/donde-esta-pi-la-proxima-variante-de-covid-una-virologa-explica-por-que-omicron-sigue-reinando/FCXOIXV2ZVCW5PHX7UK7L7COTE/&quot;                              
-## [13] &quot;/nacional/noticia/minsal-reporta-2414-nuevos-casos-de-covid-y-postividad-nacional-es-del-1374/DEHKUXIL7ZDRHMSZ2WGBITQZHU/&quot;                                                 
-## [14] &quot;/servicios/noticia/kraken-sintomas-y-senales-a-tener-en-cuenta-sobre-la-nueva-variante-de-covid-19/KWKOTKYMQNGT5M2QSKSP3CDCJY/&quot;                                            
-## [15] &quot;/nacional/noticia/minsal-reporta-3578-casos-nuevos-de-covid-y-positividad-alcanza-un-15-a-nivel-nacional/IEIGG7NCFFCKRGA7A57KQAOC34/&quot;</code></pre>
 </div>
 
 
