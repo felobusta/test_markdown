@@ -225,3 +225,15 @@ Finally, we check for the first row of our data.
 news.scraping
 
 ```
+
+
+Let's say you downloaded all the data and got 500 headlines. We will use some of my data for this example.
+
+```{r pressure 12}
+
+headlines <- read.csv("https://raw.githubusercontent.com/felobusta/test_markdown/main/data_ejemplo.csv", encoding="UTF-8")
+headlines %>% mutate(headline = as.character(titular)) %>% select(headline) ->df.headlines
+df.headlines %>% head(10)
+df.headlines %>% dim()
+
+```
